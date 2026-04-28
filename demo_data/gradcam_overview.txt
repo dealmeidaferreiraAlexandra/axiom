@@ -1,0 +1,10 @@
+Grad-CAM Visualizer
+
+This project explains how neural networks focus on image regions before making a prediction.
+It uses Grad-CAM heatmaps to highlight the most relevant areas in an input image.
+
+Key ideas:
+- image classification
+- attention visualization
+- explainable AI
+- confidence scores

@@ -1,0 +1,10 @@
+NLP Sentiment Lab
+
+This project compares different models for sentiment analysis.
+It shows where classical ML and transformer models disagree on the same text.
+
+Key ideas:
+- NLP
+- sentiment analysis
+- model disagreement
+- explainable AI

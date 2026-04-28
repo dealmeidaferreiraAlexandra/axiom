@@ -1,0 +1,10 @@
+AXIOM
+
+AXIOM is a privacy-aware AI system that searches only the data the user allows.
+It is designed to help people find local files through semantic search and explainable retrieval.
+
+Core goals:
+- controlled access
+- local file discovery
+- semantic retrieval
+- explainable results

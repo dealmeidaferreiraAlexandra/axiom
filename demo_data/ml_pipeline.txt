@@ -1,0 +1,10 @@
+End-to-End ML Pipeline
+
+This project lets users explore a full machine learning pipeline.
+It includes preprocessing, model comparison, and what-if analysis for predictions.
+
+Key ideas:
+- machine learning pipeline
+- interactive prediction
+- model comparison
+- uncertainty and confidence

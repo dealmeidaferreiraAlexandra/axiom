@@ -1,0 +1,10 @@
+Image Segmentation Studio
+
+This project compares image segmentation behavior in real time.
+It supports image upload, threshold adjustment, and visualization of masks and overlays.
+
+Key ideas:
+- computer vision
+- U-Net comparison
+- segmentation masks
+- interactive exploration

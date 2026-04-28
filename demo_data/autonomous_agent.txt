@@ -1,0 +1,10 @@
+Autonomous AI Agent
+
+This project performs research, reasoning, and structured report generation.
+It searches the web, reads documents, processes PDFs, and returns summarized findings with references.
+
+Key ideas:
+- agentic AI
+- document processing
+- research workflows
+- structured reporting
