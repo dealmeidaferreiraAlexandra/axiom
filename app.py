@@ -29,6 +29,10 @@ st.markdown(
     <style>
     .stApp { background:#020617; color:#e2e8f0; }
 
+    #MainMenu {visibility: hidden;}
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    
     .left-panel {
         border-right:1px solid #1f2231;
         padding-right:12px;
