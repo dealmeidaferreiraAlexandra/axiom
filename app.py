@@ -14,11 +14,15 @@ from core.loader import load_file_pages
 from core.chunker import chunk_text
 from core.embedder import embed_texts
 from core.indexer import Indexer
+from utils.helpers import get_logger
+
+logger = get_logger(__name__)
 
 try:
     from tkinter import Tk, filedialog
     TK_AVAILABLE = True
-except Exception:
+except ImportError as e:
+    logger.info("tkinter is not available, folder picker disabled: %s", e)
     TK_AVAILABLE = False
 
 
@@ -154,7 +158,8 @@ def pick_folder():
             )
             folder = result.stdout.strip()
             return folder if folder else None
-        except Exception:
+        except (OSError, subprocess.SubprocessError) as e:
+            logger.warning("macOS folder picker failed: %s", e)
             return None
 
     if not TK_AVAILABLE:
@@ -189,7 +194,8 @@ def open_file_in_os(path: str) -> bool:
         else:
             subprocess.Popen(["xdg-open", path])
         return True
-    except Exception:
+    except (OSError, subprocess.SubprocessError) as e:
+        logger.warning("Could not open file %s on this system: %s", path, e)
         return False
 
 
@@ -412,7 +418,8 @@ with left:
                 reset_search_state(clear_query=False)
                 st.rerun()
         except Exception as e:
-            st.error("Folder picker failed on this system.")
+            logger.exception("Folder picker failed on this system")
+            st.error(f"Folder picker failed on this system: {e}")
 
     if clear_clicked:
         st.session_state.root_path = ""
@@ -515,6 +522,7 @@ with right:
                         unsafe_allow_html=True
                     )
             except Exception:
+                logger.exception("Failed to render a search result, skipping it")
                 continue
 
     def render_start_card(loading=False):
@@ -570,6 +578,7 @@ with right:
             fallback_sources = []
             fallback_pages = []
             source_chunk_counts = {}
+            skipped_files = 0
             max_chunks = 300
             max_fallback_chunks = 120
             max_chunks_per_file = 80
@@ -587,7 +596,9 @@ with right:
 
                         try:
                             file_pages = load_file_pages(path)
-                        except Exception:
+                        except Exception as e:
+                            skipped_files += 1
+                            logger.warning("Skipping unreadable file %s: %s", path, e)
                             continue
 
                         for page_number, text in file_pages:
@@ -622,6 +633,9 @@ with right:
 
                     if len(all_chunks) >= max_chunks:
                         break
+
+            if skipped_files > 0:
+                st.info(f"Skipped {skipped_files} file(s) that could not be read. See logs for details.")
 
             if len(all_chunks) == 0:
                 all_chunks = fallback_chunks
