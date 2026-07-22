@@ -246,9 +246,9 @@ def explain_match(text: str, query: str) -> str:
             matched_terms.append(term)
 
     if matched_terms:
-        return "Este ficheiro apareceu porque contém " + ", ".join(matched_terms) + "."
+        return "This file appeared because it contains " + ", ".join(matched_terms) + "."
 
-    return "Este ficheiro apareceu porque contém conteúdo semanticamente relacionado com a pesquisa."
+    return "This file appeared because it contains content related to your search."
 
 
 def relevance_from_distance(distance: float) -> float:
