@@ -1,0 +1,4 @@
+# Test/development dependencies (in addition to requirements.txt)
+pytest
+pytest-cov
+reportlab  # used only to generate text-bearing PDFs in loader tests
