@@ -6,7 +6,9 @@ import html
 import streamlit as st
 
 import config
-from utils.helpers import open_file_in_os
+from utils.helpers import get_logger, open_file_in_os
+
+logger = get_logger(__name__)
 
 _RESULT_KEYS = (
     "rank",
@@ -138,6 +140,7 @@ def render_results(allow_open: bool = True):
                     unsafe_allow_html=True
                 )
         except Exception:
+            logger.exception("Failed to render a search result, skipping it")
             continue
 
 

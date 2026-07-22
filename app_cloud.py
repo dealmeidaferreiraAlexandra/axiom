@@ -92,7 +92,10 @@ with right:
             ui.render_pipeline(pipeline_placeholder)
 
             with st.spinner("Scanning files..."):
-                all_chunks, chunk_sources, chunk_pages = pipeline.collect_chunks(root_path, query)
+                all_chunks, chunk_sources, chunk_pages, skipped_files = pipeline.collect_chunks(root_path, query)
+
+            if skipped_files > 0:
+                st.info(f"Skipped {skipped_files} file(s) that could not be read. See logs for details.")
 
             if len(all_chunks) == 0:
                 st.session_state.stage = "input"

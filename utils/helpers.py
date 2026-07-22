@@ -6,14 +6,40 @@ import re
 import sys
 import html
 import math
+import logging
 import subprocess
 
 import config
 
+_LOGGING_CONFIGURED = False
+
+
+def get_logger(name: str) -> logging.Logger:
+    """Return a module logger, configuring a default handler once.
+
+    Using logging instead of print keeps otherwise-swallowed errors visible
+    (with severity, timestamps and, when needed, tracebacks) without crashing
+    the app.
+    """
+    global _LOGGING_CONFIGURED
+
+    if not _LOGGING_CONFIGURED:
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        )
+        _LOGGING_CONFIGURED = True
+
+    return logging.getLogger(name)
+
+
+logger = get_logger(__name__)
+
 try:
     from tkinter import Tk, filedialog
     TK_AVAILABLE = True
-except Exception:
+except ImportError as e:
+    logger.info("tkinter is not available, folder picker disabled: %s", e)
     TK_AVAILABLE = False
 
 
@@ -28,7 +54,8 @@ def pick_folder():
             )
             folder = result.stdout.strip()
             return folder if folder else None
-        except Exception:
+        except (OSError, subprocess.SubprocessError) as e:
+            logger.warning("macOS folder picker failed: %s", e)
             return None
 
     if not TK_AVAILABLE:
@@ -51,7 +78,8 @@ def open_file_in_os(path: str) -> bool:
         else:
             subprocess.Popen(["xdg-open", path])
         return True
-    except Exception:
+    except (OSError, subprocess.SubprocessError) as e:
+        logger.warning("Could not open file %s on this system: %s", path, e)
         return False
 
 

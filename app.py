@@ -6,8 +6,10 @@ import sys
 import streamlit as st
 
 import config
-from utils.helpers import TK_AVAILABLE, pick_folder
+from utils.helpers import TK_AVAILABLE, get_logger, pick_folder
 from utils import pipeline, ui
+
+logger = get_logger(__name__)
 
 st.set_page_config(page_title="AXIOM — SEEKR mode", layout="wide")
 
@@ -47,8 +49,9 @@ with left:
                 st.session_state.root_path = folder
                 ui.reset_search_state(clear_query=False)
                 st.rerun()
-        except Exception:
-            st.error("Folder picker failed on this system.")
+        except Exception as e:
+            logger.exception("Folder picker failed on this system")
+            st.error(f"Folder picker failed on this system: {e}")
 
     if clear_clicked:
         st.session_state.root_path = ""
@@ -118,7 +121,10 @@ with right:
             ui.render_pipeline(pipeline_placeholder)
 
             with st.spinner("Scanning files..."):
-                all_chunks, chunk_sources, chunk_pages = pipeline.collect_chunks(root_path, query)
+                all_chunks, chunk_sources, chunk_pages, skipped_files = pipeline.collect_chunks(root_path, query)
+
+            if skipped_files > 0:
+                st.info(f"Skipped {skipped_files} file(s) that could not be read. See logs for details.")
 
             if len(all_chunks) == 0:
                 st.session_state.stage = "input"

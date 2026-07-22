@@ -11,6 +11,7 @@ from core.chunker import chunk_text
 from core.embedder import embed_texts
 from core.indexer import Indexer
 from utils.helpers import (
+    get_logger,
     chunk_matches_query,
     extract_search_units,
     ranked_indices_by_pdf,
@@ -22,12 +23,15 @@ from utils.helpers import (
     explain_match,
 )
 
+logger = get_logger(__name__)
+
 
 def collect_chunks(root_path: str, query: str):
     """Scan ``root_path`` and return chunks matching ``query``.
 
     Falls back to the first chunks found when nothing matches the query.
-    Returns a tuple ``(chunks, sources, pages)``.
+    Returns a tuple ``(chunks, sources, pages, skipped_files)`` where
+    ``skipped_files`` counts files that could not be read.
     """
     all_chunks = []
     chunk_sources = []
@@ -36,6 +40,7 @@ def collect_chunks(root_path: str, query: str):
     fallback_sources = []
     fallback_pages = []
     source_chunk_counts = {}
+    skipped_files = 0
 
     for root_dir, dirs, files in os.walk(root_path):
         for filename in files:
@@ -46,7 +51,9 @@ def collect_chunks(root_path: str, query: str):
 
             try:
                 file_pages = load_file_pages(path)
-            except Exception:
+            except Exception as e:
+                skipped_files += 1
+                logger.warning("Skipping unreadable file %s: %s", path, e)
                 continue
 
             for page_number, text in file_pages:
@@ -83,9 +90,9 @@ def collect_chunks(root_path: str, query: str):
             break
 
     if len(all_chunks) == 0:
-        return fallback_chunks, fallback_sources, fallback_pages
+        return fallback_chunks, fallback_sources, fallback_pages, skipped_files
 
-    return all_chunks, chunk_sources, chunk_pages
+    return all_chunks, chunk_sources, chunk_pages, skipped_files
 
 
 def build_index(all_chunks):
